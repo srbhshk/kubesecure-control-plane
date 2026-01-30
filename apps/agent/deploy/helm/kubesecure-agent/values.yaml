@@ -1,0 +1,41 @@
+# Default values for kubesecure-agent.
+
+image:
+  repository: kubesecure/agent
+  pullPolicy: IfNotPresent
+  tag: '0.1.0'
+
+controlPlane:
+  url: '' # Required: e.g. https://api.kubesecure.com
+  clusterID: '' # Required: The ID assigned to this cluster
+
+agentToken: '' # Optional: Token for authentication. If provided, a Secret will be created.
+existingSecret: '' # Optional: Name of an existing Secret containing the agent token.
+secretKey: 'agent-token' # Key in the secret containing the agent token.
+
+config:
+  logLevel: info
+  development: false
+  heartbeatInterval: 30s
+  stateSendInterval: 60s
+  metricsSendInterval: 60s
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 10m
+    memory: 64Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ''
+
+rbac:
+  create: true

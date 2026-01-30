@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubesecure-agent.fullname" . }}
+  labels:
+    {{- include "kubesecure-agent.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "kubesecure-agent.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kubesecure-agent.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ include "kubesecure-agent.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: AGENT_CONTROL_PLANE_URL
+              value: {{ .Values.controlPlane.url | quote }}
+            - name: AGENT_CLUSTER_ID
+              value: {{ .Values.controlPlane.clusterID | quote }}
+            - name: AGENT_LOG_LEVEL
+              value: {{ .Values.config.logLevel | quote }}
+            - name: AGENT_DEVELOPMENT
+              value: {{ .Values.config.development | quote }}
+            - name: AGENT_HEARTBEAT_INTERVAL
+              value: {{ .Values.config.heartbeatInterval | quote }}
+            - name: AGENT_STATE_SEND_INTERVAL
+              value: {{ .Values.config.stateSendInterval | quote }}
+            - name: AGENT_METRICS_SEND_INTERVAL
+              value: {{ .Values.config.metricsSendInterval | quote }}
+            - name: AGENT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.existingSecret }}{{ .Values.existingSecret }}{{ else }}{{ include "kubesecure-agent.fullname" . }}{{ end }}
+                  key: {{ .Values.secretKey }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

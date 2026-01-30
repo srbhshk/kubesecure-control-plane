@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  users     User[]
+  clusters  Cluster[]
+  environments Environment[]
+  
+  @@map("organizations")
+}
+
+model User {
+  id             String       @id @default(cuid())
+  orgId          String
+  email          String
+  role           String       // admin, member, viewer
+  createdAt      DateTime     @default(now())
+  
+  organization   Organization @relation(fields: [orgId], references: [id])
+  
+  @@unique([orgId, email])
+  @@map("users")
+}
+
+model Cluster {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String
+  kubeconfig  String?  // Encrypted
+  agentToken  String?  // JWT token for agent
+  status      String   @default("PENDING") // PENDING, HEALTHY, OFFLINE
+  lastSeenAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  organization Organization @relation(fields: [orgId], references: [id])
+  environments EnvironmentCluster[]
+  
+  @@map("clusters")
+}
+
+model Environment {
+  id          String   @id @default(cuid())
+  orgId       String
+  name        String   // dev, staging, prod
+  criticality String   // low, medium, high
+  createdAt   DateTime @default(now())
+  
+  organization Organization @relation(fields: [orgId], references: [id])
+  clusters     EnvironmentCluster[]
+  promotions   Promotion[]
+  
+  @@unique([orgId, name])
+  @@map("environments")
+}
+
+model EnvironmentCluster {
+  id            String      @id @default(cuid())
+  environmentId String
+  clusterId     String
+  createdAt     DateTime    @default(now())
+  
+  environment   Environment @relation(fields: [environmentId], references: [id])
+  cluster       Cluster     @relation(fields: [clusterId], references: [id])
+  
+  @@unique([environmentId, clusterId])
+  @@map("environment_clusters")
+}
+
+model Promotion {
+  id            String      @id @default(cuid())
+  orgId         String
+  fromEnvId     String
+  toEnvId       String
+  status        String      // pending, approved, rejected, completed
+  prUrl         String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  fromEnv       Environment @relation("PromotionsFrom", fields: [fromEnvId], references: [id])
+  toEnv         Environment @relation("PromotionsTo", fields: [toEnvId], references: [id])
+  
+  @@map("promotions")
+}

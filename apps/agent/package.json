@@ -1,0 +1,10 @@
+{
+  "name": "agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "go build -o kubesecure-agent cmd/agent/main.go",
+    "test": "go test ./...",
+    "lint": "go vet ./..."
+  }
+}

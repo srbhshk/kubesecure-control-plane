@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: { { include "kubesecure-agent.fullname" . } }
+  labels: { { - include "kubesecure-agent.labels" . | nindent 4 } }
+data:
+  config.yaml: |
+    control_plane_url: {{ .Values.controlPlane.url | quote }}
+    cluster_id: {{ .Values.controlPlane.clusterID | quote }}
+    log_level: {{ .Values.config.logLevel | quote }}
+    development: {{ .Values.config.development }}
+    heartbeat_interval: {{ .Values.config.heartbeatInterval | quote }}
+    state_send_interval: {{ .Values.config.stateSendInterval | quote }}
+    metrics_send_interval: {{ .Values.config.metricsSendInterval | quote }}
