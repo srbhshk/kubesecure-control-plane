@@ -1,6 +1,12 @@
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function EnvironmentSetupStep() {
   return (
@@ -10,7 +16,7 @@ export function EnvironmentSetupStep() {
           <Label htmlFor="env-name">Environment Name</Label>
           <Input id="env-name" placeholder="e.g. Production, Staging" />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="criticality">Criticality</Label>
           <Select defaultValue="medium">
@@ -38,5 +44,5 @@ export function EnvironmentSetupStep() {
         </div>
       </div>
     </div>
-  )
+  );
 }

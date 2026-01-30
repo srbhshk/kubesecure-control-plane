@@ -1,135 +1,146 @@
-# Turborepo starter
+# KubeSecure Control Plane
 
-This Turborepo starter is maintained by the Turborepo core team.
+A **Git-first, security-first Kubernetes control plane** that lets teams safely promote workloads across environments with visibility into cost and policy—before anything reaches production. The control plane is a decision and workflow layer between Git (intent), Kubernetes clusters (reality), and cost signals; it **never mutates clusters directly**.
 
-## Using this example
+---
 
-Run the following command:
+## Overview
 
-```sh
-npx create-turbo@latest
-```
+- **Product**: [docs/PRD.md](docs/PRD.md) — goals, users, MVP scope.
+- **Architecture**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — principles, deployment model, responsibilities.
+- **Tech stack**: [docs/TECH_STACK_DETAILS.md](docs/TECH_STACK_DETAILS.md) — languages, frameworks, tools per app.
 
-## What's inside?
+This repo is a **Turborepo monorepo** (pnpm). It contains the Control Plane apps (API, Web) and the Kubernetes Agent that runs inside your clusters.
 
-This Turborepo includes the following packages/apps:
+---
 
-### Apps and Packages
+## Architecture and flow
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Principles
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- **Git is the only mutation path** — changes flow via Git PRs, not direct cluster writes.
+- **Kubernetes agent is read-only** — observes cluster state and metrics; never applies or deletes.
+- **Outbound-only** — agent connects to the Control Plane over HTTPS; Control Plane never pushes into clusters.
+- **Environment is first-class** — dev/staging/prod modeled with promotion workflows.
 
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+### High-level flow
 
 ```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+Git (desired state)  ──►  Control Plane  ──►  Git PR / workflows
+                              ▲
+Kubernetes clusters   ──►  Agent (observe) ──►  Control Plane (state, metrics, drift)
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+- **Control Plane** (API + Web): auth, environments, promotions, cost, policy, LLM explanations. It reads from Git and from agents; it does not write to clusters.
+- **Agent** (per cluster): reads workloads and metrics, sends heartbeat/state/metrics to the API, can support drift detection and promotion verification.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+### Data separation
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+- **Desired state** — in Git.
+- **Observed state** — from clusters via the agent.
+- **Drift** — explicit comparison; desired and observed are not merged.
 
-### Develop
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full detail.
 
-To develop all apps and packages, run the following command:
+---
 
-```
-cd my-turborepo
+## Repo structure
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+| Path           | Description                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| **apps/api**   | Control Plane backend — Fastify, Prisma (PostgreSQL), JWT, agent and cluster routes.                  |
+| **apps/web**   | Control Plane UI — Next.js, Clerk, shadcn/ui, dashboard, clusters, promotions, drift, cost.           |
+| **apps/agent** | Kubernetes agent — Go, read-only observer; sends heartbeat/state/metrics to the API; deploy via Helm. |
+| **packages/**  | Shared configs (ESLint, TypeScript) and UI primitives.                                                |
+| **docs/**      | PRD, architecture, API spec, tech stack, quick start, threat model.                                   |
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+Each app has its own **README** for app-specific setup and development:
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+- [apps/api](apps/api) — no README yet; see [docs/QUICK_START_IMPLEMENTATION.md](docs/QUICK_START_IMPLEMENTATION.md) for API setup.
+- [apps/web](apps/web/README.md) — Next.js and local dev.
+- [apps/agent](apps/agent/README.md) — Go agent: config, local run, Helm deploy, code layout.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+---
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+## Quick start
 
-### Remote Caching
+### Prerequisites
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+- **Node.js** ≥18 (see [package.json](package.json) `engines`)
+- **pnpm** 9.x (`corepack enable && corepack prepare pnpm@9 --activate`)
+- **Docker** (optional, for Postgres/Redis via `docker compose`)
+- **Go** 1.21+ (only for building or changing the agent)
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
+### Install and run
 
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+```bash
+# Clone and install
+git clone <repo-url>
+cd kubesecure-control-plane
+pnpm install
 
-```
-cd my-turborepo
+# Optional: start Postgres and Redis for the API
+docker compose up -d
 
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+# Run all apps in dev (API, Web; agent is Go and run separately)
+pnpm dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+Then:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+- **API**: http://localhost:3001 (health: http://localhost:3001/health, docs: http://localhost:3001/docs if Swagger is mounted).
+- **Web**: http://localhost:3000.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
+To run a single app:
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+```bash
+pnpm --filter api dev
+pnpm --filter web dev
 ```
 
-## Useful Links
+The **agent** is Go and not started by `pnpm dev`. To run it locally (with a kubeconfig and the API running), see [apps/agent/README.md](apps/agent/README.md).
 
-Learn more about the power of Turborepo:
+### Build and test
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+```bash
+pnpm build
+pnpm test
+pnpm lint
+```
+
+---
+
+## Documentation
+
+| Document                                                                 | Purpose                                     |
+| ------------------------------------------------------------------------ | ------------------------------------------- |
+| [docs/PRD.md](docs/PRD.md)                                               | Product requirements and MVP.               |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)                             | System design and responsibilities.         |
+| [docs/API_SPEC.md](docs/API_SPEC.md)                                     | API principles and Agent endpoints.         |
+| [docs/TECH_STACK_DETAILS.md](docs/TECH_STACK_DETAILS.md)                 | Stack per app (Fastify, Next.js, Go, etc.). |
+| [docs/QUICK_START_IMPLEMENTATION.md](docs/QUICK_START_IMPLEMENTATION.md) | Step-by-step monorepo and app setup.        |
+| [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md)                             | Security and threat model.                  |
+| [docs/EPICS_AND_STORIES.md](docs/EPICS_AND_STORIES.md)                   | High-level epics and stories.               |
+| [docs/INITIALIZATION_PLAN.md](docs/INITIALIZATION_PLAN.md)               | Initialization and phasing.                 |
+
+---
+
+## Monorepo commands
+
+| Command                         | Description                                             |
+| ------------------------------- | ------------------------------------------------------- |
+| `pnpm install`                  | Install dependencies for all workspaces.                |
+| `pnpm dev`                      | Run dev tasks (API, Web; see [turbo.json](turbo.json)). |
+| `pnpm build`                    | Build all apps and packages.                            |
+| `pnpm test`                     | Run tests.                                              |
+| `pnpm lint`                     | Lint.                                                   |
+| `pnpm format`                   | Format with Prettier.                                   |
+| `pnpm --filter <name> <script>` | Run a script in one app (e.g. `pnpm --filter api dev`). |
+
+---
+
+## Summary
+
+- **Root README** (this file): project overview, architecture, flow, repo layout, quick start, and links to docs and app READMEs.
+- **docs/** — product, architecture, API, tech stack, and implementation guides.
+- **apps/\*/README.md** — per-app details (run, config, deploy). Start with the root README, then open the README for the app you’re working on.

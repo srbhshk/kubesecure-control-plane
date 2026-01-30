@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface AuthState {
   role: string | null;
@@ -17,7 +17,7 @@ export const useAuthStore = create<AuthState>()(
       clearAuth: () => set({ role: null, orgId: null }),
     }),
     {
-      name: "kubesecure-auth",
+      name: 'kubesecure-auth',
     }
   )
 );

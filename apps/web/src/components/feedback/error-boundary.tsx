@@ -1,29 +1,29 @@
-"use client"
+'use client';
 
-import React, { ErrorInfo } from "react"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, RotateCcw } from "lucide-react"
+import React, { ErrorInfo } from 'react';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle, RotateCcw } from 'lucide-react';
 
 interface Props {
-  children?: React.ReactNode
+  children?: React.ReactNode;
 }
 
 interface State {
-  hasError: boolean
-  error?: Error
+  hasError: boolean;
+  error?: Error;
 }
 
 export class ErrorBoundary extends React.Component<Props, State> {
   public state: State = {
-    hasError: false
-  }
+    hasError: false,
+  };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo)
+    console.error('Uncaught error:', error, errorInfo);
   }
 
   public render() {
@@ -48,9 +48,9 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <RotateCcw className="h-4 w-4" /> Try again
           </Button>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }

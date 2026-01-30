@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, AlertCircle } from "lucide-react"
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 export function PromotionPreviewStep() {
   return (
@@ -33,5 +33,5 @@ export function PromotionPreviewStep() {
         </div>
       </div>
     </div>
-  )
+  );
 }

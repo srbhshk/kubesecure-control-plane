@@ -1,9 +1,9 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface Environment {
   id: string;
   name: string;
-  criticality: "low" | "medium" | "high";
+  criticality: 'low' | 'medium' | 'high';
   clusterCount: number;
 }
 

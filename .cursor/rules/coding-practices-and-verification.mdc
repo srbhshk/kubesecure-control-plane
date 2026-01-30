@@ -1,0 +1,32 @@
+---
+description: Best practices per tech stack, refactor when needed, handle corner cases and errors, run build and lint after changes
+alwaysApply: true
+---
+
+# Coding Practices and Verification
+
+## Follow Stack Best Practices
+
+- **Web (Next.js/React)**: Functional components, React Query for server state, Zustand for client state, Zod for validation, shadcn/Radix UI patterns. Use error boundaries and loading/empty states.
+- **API (Fastify/Prisma)**: Validate input with Zod, use Prisma for DB access, structured error responses, proper HTTP status codes.
+- **Agent (Go)**: Idiomatic Go (error handling, context propagation), structured logging, avoid panics in hot paths.
+
+Refactor when code is duplicated, hard to test, or violates these patterns.
+
+## Corner Cases and Errors
+
+- Handle null/undefined, empty arrays, and missing env/config explicitly—no silent fallbacks unless intentional.
+- API routes: validate request body/query, return 4xx/5xx with consistent error shape, log errors server-side.
+- Async/await: use try/catch; surface errors to the user or log them; avoid swallowing exceptions.
+- Go: always check and handle returned errors; wrap with context when appropriate.
+
+## Build and Lint After Changes
+
+After making code changes, run from repo root:
+
+1. **Lint**: `pnpm run lint`
+2. **Type-check**: `pnpm run check-types`
+3. **Build**: `pnpm run build`
+4. **Format** (if touching style): `pnpm run format`
+
+Fix any lint or type errors before considering the change complete. If a command fails, address the reported issues and re-run.

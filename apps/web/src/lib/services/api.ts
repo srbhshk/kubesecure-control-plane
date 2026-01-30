@@ -1,15 +1,15 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import { errorService } from "./error";
+import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import { errorService } from './error';
 
 class ApiService {
   private instance: AxiosInstance;
 
   constructor() {
     this.instance = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
       timeout: 10000,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
@@ -44,15 +44,27 @@ class ApiService {
     return this.instance.get(url, config);
   }
 
-  public async post<T>(url: string, data?: unknown, config?: InternalAxiosRequestConfig): Promise<T> {
+  public async post<T>(
+    url: string,
+    data?: unknown,
+    config?: InternalAxiosRequestConfig
+  ): Promise<T> {
     return this.instance.post(url, data, config);
   }
 
-  public async put<T>(url: string, data?: unknown, config?: InternalAxiosRequestConfig): Promise<T> {
+  public async put<T>(
+    url: string,
+    data?: unknown,
+    config?: InternalAxiosRequestConfig
+  ): Promise<T> {
     return this.instance.put(url, data, config);
   }
 
-  public async patch<T>(url: string, data?: unknown, config?: InternalAxiosRequestConfig): Promise<T> {
+  public async patch<T>(
+    url: string,
+    data?: unknown,
+    config?: InternalAxiosRequestConfig
+  ): Promise<T> {
     return this.instance.patch(url, data, config);
   }
 

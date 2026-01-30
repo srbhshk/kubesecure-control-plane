@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export enum OnboardingStep {
   WELCOME = 0,
@@ -37,7 +37,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       reset: () => set({ currentStep: OnboardingStep.WELCOME, isCompleted: false }),
     }),
     {
-      name: "kubesecure-onboarding",
+      name: 'kubesecure-onboarding',
     }
   )
 );

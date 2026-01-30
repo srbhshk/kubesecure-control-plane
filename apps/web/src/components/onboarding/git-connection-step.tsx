@@ -1,5 +1,5 @@
-import { Github, Globe } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Github, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function GitConnectionStep() {
   return (
@@ -28,5 +28,5 @@ export function GitConnectionStep() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

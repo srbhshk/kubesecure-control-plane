@@ -1,4 +1,4 @@
-import { ShieldAlert } from "lucide-react"
+import { ShieldAlert } from 'lucide-react';
 
 export function DriftDetectionStep() {
   return (
@@ -26,5 +26,5 @@ export function DriftDetectionStep() {
         </div>
       </div>
     </div>
-  )
+  );
 }

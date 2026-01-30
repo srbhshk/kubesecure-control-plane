@@ -1,4 +1,4 @@
-import { Rocket, Shield, Zap } from "lucide-react"
+import { Rocket, Shield, Zap } from 'lucide-react';
 
 export function WelcomeStep() {
   return (
@@ -18,17 +18,21 @@ export function WelcomeStep() {
           <Shield className="h-6 w-6 text-primary mt-1" />
           <div>
             <h3 className="font-semibold">Security First</h3>
-            <p className="text-sm text-muted-foreground">Preview every promotion with full policy enforcement before it reaches production.</p>
+            <p className="text-sm text-muted-foreground">
+              Preview every promotion with full policy enforcement before it reaches production.
+            </p>
           </div>
         </div>
         <div className="flex items-start gap-4 p-4 border rounded-lg">
           <Zap className="h-6 w-6 text-primary mt-1" />
           <div>
             <h3 className="font-semibold">GitOps Powered</h3>
-            <p className="text-sm text-muted-foreground">Maintain Git as the single source of truth for all your infrastructure and workloads.</p>
+            <p className="text-sm text-muted-foreground">
+              Maintain Git as the single source of truth for all your infrastructure and workloads.
+            </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

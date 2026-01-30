@@ -1,8 +1,8 @@
-import { Terminal, Copy } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Terminal, Copy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function AgentInstallStep() {
-  const installCommand = "helm install kubesecure-agent kubesecure/agent --set token=ks_abc123"
+  const installCommand = 'helm install kubesecure-agent kubesecure/agent --set token=ks_abc123';
 
   return (
     <div className="space-y-6">
@@ -17,7 +17,11 @@ export function AgentInstallStep() {
         <pre className="bg-slate-950 text-slate-50 p-4 rounded-lg text-xs font-mono overflow-x-auto">
           <code>{installCommand}</code>
         </pre>
-        <Button size="icon" variant="ghost" className="absolute top-2 right-2 h-8 w-8 text-slate-400 group-hover:text-slate-50">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute top-2 right-2 h-8 w-8 text-slate-400 group-hover:text-slate-50"
+        >
           <Copy className="h-4 w-4" />
         </Button>
       </div>
@@ -27,5 +31,5 @@ export function AgentInstallStep() {
         <span className="text-sm">Waiting for agent connection...</span>
       </div>
     </div>
-  )
+  );
 }

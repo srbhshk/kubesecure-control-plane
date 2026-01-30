@@ -1,10 +1,10 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface Promotion {
   id: string;
   fromEnv: string;
   toEnv: string;
-  status: "pending" | "approved" | "rejected" | "completed";
+  status: 'pending' | 'approved' | 'rejected' | 'completed';
   createdAt: string;
 }
 
@@ -20,12 +20,9 @@ export const usePromotionsStore = create<PromotionsState>((set) => ({
   promotions: [],
   isLoading: false,
   setPromotions: (promotions) => set({ promotions }),
-  addPromotion: (promotion) =>
-    set((state) => ({ promotions: [promotion, ...state.promotions] })),
+  addPromotion: (promotion) => set((state) => ({ promotions: [promotion, ...state.promotions] })),
   updatePromotion: (id, updates) =>
     set((state) => ({
-      promotions: state.promotions.map((p) =>
-        p.id === id ? { ...p, ...updates } : p
-      ),
+      promotions: state.promotions.map((p) => (p.id === id ? { ...p, ...updates } : p)),
     })),
 }));

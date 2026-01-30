@@ -20,13 +20,14 @@ export function CostVisibilityStep() {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      
+
       <div className="space-y-2">
         <h4 className="text-sm font-semibold">Spending by Environment</h4>
         <p className="text-sm text-muted-foreground">
-          KubeSecure attributes costs directly to your environments and services, giving you a clear picture of your cloud spend.
+          KubeSecure attributes costs directly to your environments and services, giving you a clear
+          picture of your cloud spend.
         </p>
       </div>
     </div>
-  )
+  );
 }
