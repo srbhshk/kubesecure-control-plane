@@ -11,7 +11,7 @@ export function Header() {
   const toggleSidebarMode = useUIStore((state) => state.toggleSidebarMode);
 
   return (
-    <header className="glass-header sticky top-0 z-40 w-full border-b shadow-lg">
+    <header className="glass-header sticky top-0 z-40 w-full border-b">
       <div className="flex h-14 items-center justify-between mx-10">
         <div className="flex items-center gap-4">
           <Button
