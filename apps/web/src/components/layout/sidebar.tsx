@@ -10,7 +10,6 @@ import {
   BarChart3,
   ShieldAlert,
   Settings,
-  Server,
   GanttChartSquare,
 } from 'lucide-react';
 import { useUIStore } from '@/lib/store/ui.store';
@@ -30,12 +29,6 @@ const navItems = [
     href: '/environments',
     icon: Layers,
     permission: 'environments.view',
-  },
-  {
-    title: 'Clusters',
-    href: '/clusters',
-    icon: Server,
-    permission: 'clusters.view',
   },
   {
     title: 'Promotions',
@@ -83,10 +76,9 @@ export function Sidebar() {
     <TooltipProvider delayDuration={150}>
       <aside
         className={cn(
-          'shadow-2xl fixed left-0 top-50 z-30 border-r duration-200 motion-reduce:transition-none rounded-r-xl',
-          'bg-background/50 backdrop-blur-sm ',
+          'glass-sidebar fixed left-0 top-50 z-30 border-r duration-200 motion-reduce:transition-none rounded-r-xl',
           // Desktop width modes
-          isExpanded ? 'md:w-64' : 'md:w-16 bg-background/10 backdrop-blur-xs',
+          isExpanded ? 'md:w-64' : 'md:w-16',
           // Mobile overlay slide
           mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         )}
@@ -126,7 +118,7 @@ export function Sidebar() {
                       )}
                       aria-hidden="true"
                     >
-                      <item.icon className="h-4 w-4" />
+                      <item.icon className="h-4 w-4" strokeWidth={3} />
                     </span>
 
                     <span
